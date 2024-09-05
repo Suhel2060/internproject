@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AjaxController;
 use App\Http\Controllers\CatagoryController;
 use App\Http\Controllers\PostController;
 use App\Http\Middleware\Authenticate;
@@ -53,3 +54,5 @@ Route::get('/email', function () {
 Route::get('/jquery_practice',function (){
 return view('practice.jquery_practice');
 });
+Route::get('/ajaxtest',[AjaxController::class,'testajax']);
+Route::get('/ajaxtest_show',[AjaxController::class,'testajax_show'])->name('ajax.test');
