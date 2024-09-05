@@ -21,7 +21,7 @@
                     </div>
                   </nav>
 
-                  <form method="post" action="{{route('post.store')}}" enctype="multipart/form-data">
+                  <form method="post" action="" enctype="multipart/form-data" class="post_create">
                     @csrf
                     <div class="row">
                       <div class="col-md-6">
@@ -91,4 +91,29 @@
             </div>
         </div>
     </div>
+    <script>
+      $('.post_create').submit(function (e) { 
+        e.preventDefault();
+        const formdata=new FormData(this);
+        $.ajax({
+          type: "POST",
+          url: "{{route('post.store')}}",
+          data: formdata,
+          processData:false,
+          contentType:false,
+          success: function (response) {
+            window.location.href="{{ route('post.index') }}";
+          },
+          error:function (xhr,error){
+            Swal.fire({
+  title: "Failed!",
+  text: "Data Store failed",
+  icon: "error"
+});
+$('input').val('');
+          }
+        });
+        
+      });
+    </script>
 @endsection

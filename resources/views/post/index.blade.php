@@ -66,11 +66,11 @@
                                 <td>
                                     <a name="edit" id="" class="btn btn-primary"
                                         href="{{ route('post.edit', $item) }}" role="button">Edit</a>
-                                    <button type="button" class="btn btn-danger delete-button">Delete</button>
-                                    <form action='{{ route('post.destroy', $item) }}' method="post">
+                                    <button type="button" class="btn btn-danger delete-button" id="{{ $item->id }}">Delete</button>
+                                    {{-- <form action='{{ route('post.destroy', $item) }}' method="post">
                                         @method('DELETE')
                                         @csrf
-                                    </form>
+                                    </form> --}}
 
                                 </td>
 
@@ -85,7 +85,13 @@
         </div>
     </div>
     <script>
+        
         $(document).ready(function() {
+            $.ajaxSetup({
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                }
+            });
             $('.delete-button').on('click', function() {
                 Swal.fire({
                     title: "Are you sure?",
@@ -97,19 +103,48 @@
                     confirmButtonText: "Yes, delete it!"
                 }).then((result) => {
                     if (result.isConfirmed) {
-                        $(this).next().submit();
-                        Swal.fire({
-                            title: "Deleted!",
-                            text: "Your file has been deleted.",
-                            icon: "success"
+                        // $(this).next().submit();
+                        // Swal.fire({
+                        //     title: "Deleted!",
+                        //     text: "Your file has been deleted.",
+                        //     icon: "success"
+                        // });
+                        const ref = $(this)
+                        const id=parseInt($(this).attr('id'));
+                        console.log(id)
+                        $.ajax({
+                            type: "DELETE",
+                            url: "{{ route('post.destroy','') }}/"+id,
+                            success: function(response) {
+                                console.log(response)
+                                if (response.success) {
+                                    ref.parent().parent().remove();
+                                    Swal.fire({
+                                        title: "Succeess!",
+                                        text: response.message,
+                                        icon: "success"
+                                    });
+                                } else {
+                                    Swal.fire({
+                                        title: "Failed!",
+                                        text: response.message,
+                                        icon: "error"
+                                    });
+                                }
+                            },
+                            error: function(xhr, status) {
+                                Swal.fire({
+                                    title: "Failed!",
+                                    text: "Data Delete failed",
+                                    icon: "error"
+                                });
+                                console.log('Error:', xhr.responseText);  // This will also show the dumped content
+
+                            }
                         });
                     }
                 });
             })
         })
-
-
     </script>
-        
-           
 @endsection
