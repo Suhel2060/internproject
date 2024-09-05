@@ -87,7 +87,7 @@ class PostController extends Controller
             
         ]);
 
-        return redirect()->route('post.index');
+        // return redirect()->route('post.index');
     }
 
   
@@ -150,15 +150,21 @@ class PostController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Post $post)
+    public function destroy($post)
     {
         try{
-            unlink(public_path('images/'.$post->image));
-            Post::find($post->id)->delete();
-            return redirect()->route('post.index')->with("success","Data deleted Successfully");
+            $deleteaction=Post::find($post);
+            if($deleteaction){
+
+                unlink(public_path('images/'.$deleteaction->image));
+                $deleteaction->delete();
+                // return redirect()->route('post.index')->with("success","Data deleted Successfully");
+                return response()->json(['success' => true,'message' => "Data Deleted Successfully"]);
+            }
 
         }catch(Exception $e){
-            return redirect()->back()->with("error",$e->getMessage());
+            // return redirect()->back()->with("error",$e->getMessage());
+            return response()->json(['success'=>false,'message'=>$e->getMessage()]);
         }
     }
 }
