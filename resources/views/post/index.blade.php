@@ -11,8 +11,12 @@
                                 <a class="nav-link" href="#">Post</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link" href="{{ route('post.create') }}">Create</a>
+                                <a class="nav-link" href="#" data-bs-toggle="modal"
+                                    data-bs-target="#createModal">Create</a>
+                                {{-- <a class="nav-link" href="{{ route('post.create') }}">Create</a> --}}
                             </li>
+                            @include('post.modal')
+
                         </ul>
                     </div>
                 </nav>
@@ -64,15 +68,17 @@
                             </td>  --}}
 
                                 <td>
-                                    <a name="edit" id="" class="btn btn-primary"
-                                        href="{{ route('post.edit', $item) }}" role="button">Edit</a>
-                                    <button type="button" class="btn btn-danger delete-button" id="{{ $item->id }}">Delete</button>
+                                    <a name="edit" id="{{ $item->id }}" class="btn btn-primary update-btn"
+                                        role="button" data-bs-toggle="modal" data-bs-target="#updateModal">Edit</a>
+                                    <button type="button" class="btn btn-danger delete-button"
+                                        id="{{ $item->id }}">Delete</button>
                                     {{-- <form action='{{ route('post.destroy', $item) }}' method="post">
                                         @method('DELETE')
                                         @csrf
                                     </form> --}}
 
                                 </td>
+
 
                             </tr>
                         @endforeach
@@ -85,14 +91,87 @@
         </div>
     </div>
     <script>
-        
         $(document).ready(function() {
             $.ajaxSetup({
                 headers: {
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                 }
             });
-            $('.delete-button').on('click', function() {
+
+
+
+
+            //create post 
+            $('.post_create').submit(function(e) {
+                e.preventDefault();
+                const formdata = new FormData(this);
+                $.ajax({
+                    type: "POST",
+                    url: "{{ route('post.store') }}",
+                    data: formdata,
+                    processData: false,
+                    contentType: false,
+                    success: function(response) {
+                        console.log(response)
+                        if (response.success) {
+                            Swal.fire({
+                                title: "Success!",
+                                text: response.message,
+                                icon: "success"
+                            })
+                            pageRelod(response.data)
+                        }
+
+                    },
+                    error: function(xhr, error) {
+                        Swal.fire({
+                            title: "Failed!",
+                            text: "Data Store failed",
+                            icon: "error"
+                        });
+                        $('input').val('');
+                    }
+                });
+
+            });
+
+            function pageRelod(serverdata) {
+                let i = 1;
+                let data = serverdata.map((data) => {
+                    return `<tr> 
+                                <td>${i++}</td>
+                                <td>${data.title}</td>
+                                <td>${data.content}</td>
+                                <td>${data.status}</td>
+                                <td>${data.catagory.catagory}</td>
+                                <td>${data.user.name}</td>
+                                <td><img src="/images/${data.image}"  width="100" height="100"></td>
+                                 <td>
+                                    <a name="edit" id="" class="btn btn-primary update-btn" id="${data.id}" role="button" data-bs-toggle="modal"
+                                    data-bs-target="#updateModal">Edit</a>
+                                    <button type="button" class="btn btn-danger delete-button"id="${data.id}">Delete</button>
+                                
+                                </td>
+                                
+                            </tr>`
+                });
+
+
+                $('tbody').html(data);
+                $('.modal').modal('hide');
+                $('.post_create input').val('');
+                $('.post_create textarea').val('');
+
+            }
+
+
+
+            //for deleting the data
+
+            //event delegation when the button is dynamically added this event listener will not work 
+
+            //so use already  existed element when the page was initially loaded in this casse tbody
+            $('tbody').on('click', '.delete-button', function() {
                 Swal.fire({
                     title: "Are you sure?",
                     text: "You won't be able to revert this!",
@@ -110,13 +189,12 @@
                         //     icon: "success"
                         // });
                         const ref = $(this)
-                        const id=parseInt($(this).attr('id'));
+                        const id = parseInt($(this).attr('id'));
                         console.log(id)
                         $.ajax({
                             type: "DELETE",
-                            url: "{{ route('post.destroy','') }}/"+id,
+                            url: "{{ route('post.destroy', '') }}/" + id,
                             success: function(response) {
-                                console.log(response)
                                 if (response.success) {
                                     ref.parent().parent().remove();
                                     Swal.fire({
@@ -138,13 +216,74 @@
                                     text: "Data Delete failed",
                                     icon: "error"
                                 });
-                                console.log('Error:', xhr.responseText);  // This will also show the dumped content
+                                console.log('Error:', xhr
+                                    .responseText
+                                ); // This will also show the dumped content
 
                             }
                         });
                     }
                 });
             })
+
+
+
+            //set update data in model
+            // $('tbody').on("click",".update-btn",function(e) {
+            let updateid;
+            $('.update-btn').click(function(e) {
+                console.log("hello")
+                e.preventDefault();
+                let id = $(this).attr('id');
+
+
+                $.ajax({
+                    type: "GET",
+                    url: `{{ url('post') }}/` + id + "/edit",
+                    processData: false,
+                    contentType: false,
+                    success: function(response) {
+                        console.log(response)
+                        updateid = {
+                            "image": response.data.image,
+                            "id": response.data.id
+                        };
+                        $('.post_update .title').val(response.data.title);
+                        $('.post_update .content').val(response.data.content);
+                        $('.post_update .catagory').val(response.data.catagory_id);
+                        $('.post_update .status').val(response.data.status);
+                        $('.post_update img').attr('src', '/images/' + response.data.image);
+
+                    }
+                });
+
+            });
+
+
+            //update the data
+            $('.post_update').submit(function(e) {
+                e.preventDefault();
+                const formdata = new FormData(this)
+                console.log(formdata.get('title'));
+                console.log(updateid.id)
+                $.ajax({
+                    type: "POST",
+                    url: "{{ route('post.update', '') }}/" + updateid.id,
+                    data: formdata,
+                    processData: false,
+                    contentType: false,
+                    success: function(response) {
+                        Swal.fire({
+                            title: "Succeess!",
+                            text: response.message,
+                            icon: "success"
+                        });
+                        pageRelod(response.data)
+                    }
+                });
+            })
+
+
         })
     </script>
 @endsection
