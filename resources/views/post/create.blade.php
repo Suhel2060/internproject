@@ -102,7 +102,17 @@
           processData:false,
           contentType:false,
           success: function (response) {
-            window.location.href="{{ route('post.index') }}";
+            if(response.success){
+              Swal.fire({
+                            title: "Success!",
+                            text: response.message,
+                            icon: "success"
+                        }).then((request)=>{
+                          if(request.isConfirmed)
+                          window.location.href="{{ route('post.index') }}";
+                        })
+            }
+     
           },
           error:function (xhr,error){
             Swal.fire({
