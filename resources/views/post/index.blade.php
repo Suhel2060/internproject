@@ -147,7 +147,7 @@
                                 <td>${data.user.name}</td>
                                 <td><img src="/images/${data.image}"  width="100" height="100"></td>
                                  <td>
-                                    <a name="edit" id="" class="btn btn-primary update-btn" id="${data.id}" role="button" data-bs-toggle="modal"
+                                    <a name="edit" class="btn btn-primary update-btn" id="${data.id}" role="button" data-bs-toggle="modal"
                                     data-bs-target="#updateModal">Edit</a>
                                     <button type="button" class="btn btn-danger delete-button"id="${data.id}">Delete</button>
                                 
@@ -231,7 +231,7 @@
             //set update data in model
             // $('tbody').on("click",".update-btn",function(e) {
             let updateid;
-            $('.update-btn').click(function(e) {
+            $('tbody').on("click",".update-btn",function(e) {
                 console.log("hello")
                 e.preventDefault();
                 let id = $(this).attr('id');
@@ -278,6 +278,7 @@
                             text: response.message,
                             icon: "success"
                         });
+                        console.log(response.data)
                         pageRelod(response.data)
                     }
                 });

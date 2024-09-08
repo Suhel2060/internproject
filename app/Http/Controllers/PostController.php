@@ -142,7 +142,10 @@ class PostController extends Controller
                 $imageName = time() . '.' . $request->image->extension();
                 //moving image to the public/images/imagename path
                 $request->image->move(public_path('images'), $imageName);
-                unlink(public_path('images/' . $post->image));
+                if(file_exists(public_path('images/' . $post->image))){
+                    unlink(public_path('images/' . $post->image));
+                }
+                
             } else {
                 $imageName = $post->image;
             }
