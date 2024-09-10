@@ -138,7 +138,7 @@ class PostApiController extends Controller
 
     public function updatePost(Request $request,int $id){
         try {
-            // dd($request);
+            dd($request);
             $post=Post::findOrFail($id);
             if ($request->hasFile('image')) {
                 $imageName = time() . '.' . $request->image->extension();
