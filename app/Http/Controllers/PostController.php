@@ -178,8 +178,9 @@ class PostController extends Controller
         try {
             $deleteaction = Post::find($post);
             if ($deleteaction) {
-
-                unlink(public_path('images/' . $deleteaction->image));
+                if(file_exists(public_path('images/' . $deleteaction->image))){
+                    unlink(public_path('images/' . $deleteaction->image));
+                }
                 $deleteaction->delete();
                 // return redirect()->route('post.index')->with("success","Data deleted Successfully");
                 return response()->json(['success' => true, 'message' => "Data Deleted Successfully"]);
