@@ -2,16 +2,73 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Http\Controllers\Controller;
+
+use App\Jobs\ProcessMail;
+use App\Mail\SendMail;
+use Exception;
 use App\Models\Post;
 use App\Models\User;
-use Exception;
 use Illuminate\Http\Request;
+
+use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
 
-
+ /**
+ * @OA\Info(
+ *     version="1.0",
+ *     title="Api for Post"
+ * )
+ */
 class PostApiController extends Controller
 {
+    
+ /**
+ * @OA\PathItem(
+ *     path="/api/signup",
+ *     @OA\Post(
+ *         summary="Sign Up a new User",
+ *         @OA\RequestBody(
+ *             @OA\MediaType(
+ *                 mediaType="multipart/form-data",
+ *                 @OA\Schema(
+ *                     @OA\Property(
+ *                         property="email",
+ *                         type="string"
+ *                     ),
+ *                     @OA\Property(
+ *                         property="name",
+ *                         type="string"
+ *                     ),
+ *                     @OA\Property(
+ *                         property="password",
+ *                         type="string"
+ *                     ),
+ *                     example={"email": "maharjan@gmail.com", "name": "Suhel Maharjan", "phone": "98089687878"}
+ *                 )
+ *             )
+ *         ),
+ *         @OA\Response(
+ *             response=200,
+ *             description="OK",
+ *            @OA\JsonContent(
+ *             @OA\Property(
+ *                 property="message",
+ *                 type="string",
+ *                 example="user sign up successfully"
+ *             ),
+ *             @OA\Property(
+ *                 property="user",
+ *                 type="object",
+ *                 @OA\Property(property="name", type="string", example="suhel"),
+ *                 @OA\Property(property="email", type="string", example="maharjan@gmail.com"),
+ *             )
+ *         ),
+
+ *         )
+ *     )
+ * )
+ */
     public function registerUser(Request $request){
         try{
 
@@ -25,6 +82,17 @@ class PostApiController extends Controller
                 'email'=>$userdata['email'],
                 'password'=>Hash::make($userdata['password']),
             ]);
+            $subject="YOur Account have been regitsered";
+
+            // Mail::to($user)->send(new SendMail($subject,$user));
+            // Mail::to($user)->send(new SendMail($subject,$user));
+            // Mail::to($user)->send(new SendMail($subject,$user));
+
+            dispatch(new ProcessMail($subject,$user));
+            // dispatch(new ProcessMail($subject,$user));
+            // dispatch(new ProcessMail($subject,$user));
+            // dispatch(new ProcessMail($subject,$user));
+            // dispatch(new ProcessMail($subject,$user));
             return response()->json([
                 "message"=>"User Signup Successfully",
                 "user"=>$user

@@ -1,28 +1,34 @@
 @extends('layouts.app');
 @section('content')
-<nav class="navbar navbar-expand-lg navbar-light bg-light">
-    <div class="collapse navbar-collapse" id="navbarSupportedContent">
-        <ul class="navbar-nav mr-auto">
-            <li class="nav-item active">
-                <a class="nav-link" href='{{ url("/assignroles") }}'
-                >Assign Roles and Permission</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href='{{ url("/roles") }}'
-                   >Create Roles and permission</a>
-                {{-- <a class="nav-link" href="{{ route('post.create') }}">Create</a> --}}
-            </li>
+    <div class="container">
 
-        </ul>
+        <nav class="navbar navbar-expand-lg navbar-light bg-light">
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav mr-auto">
+                    <li class="nav-item active">
+                        <a class="nav-link" href='{{ url('/assignroles') }}'>Assign Roles and Permission</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href='{{ url('/roles') }}'>Create Roles and permission</a>
+                        {{-- <a class="nav-link" href="{{ route('post.create') }}">Create</a> --}}
+                    </li>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href='{{ route('post.index') }}'>Post</a>
+                        {{-- <a class="nav-link" href="{{ route('post.create') }}">Create</a> --}}
+                    </li>
+
+                </ul>
+            </div>
+        </nav>
     </div>
-</nav>
     <div class="container">
 
 
-       
+
         <h3>Create Roles and permission</h3>
 
-        <div class="roles border border-dark p-5" >
+        <div class="roles border border-dark p-5">
             <h4>Create Roles</h4>
             <form class="role-form" action="" method="post" enctype="multipart/form-data">
                 @csrf
@@ -39,7 +45,7 @@
                         @endforeach
                     </select>
                 </div>
-                
+
 
                 <button type="submit" name="submit" id="submit" class="btn btn-primary">
                     Submit</button>
@@ -63,16 +69,17 @@
                         @endphp
                         @foreach ($roles as $role)
                             <tr>
-                                <td>{{$i++}}</td>
+                                <td>{{ $i++ }}</td>
                                 <td>{{ $role->name }}</td>
-                                <td>@foreach ($role->permissions as $permission )
-                                    <span>{{ $permission->name }}, </span>
-                                 @endforeach</td>
                                 <td>
-                                    <a name="edit" class="btn btn-primary update-btn"
-                                        role="button">Edit</a>
-                                    <button type="button" class="btn btn-danger delete-button"
-                                        >Delete</button>
+                                    @foreach ($role->permissions as $permission)
+                                        <span>{{ $permission->name }}, </span>
+                                    @endforeach
+                                </td>
+                                <td>
+                                    <a name="edit" class="btn btn-primary update-btn" role="button">Edit</a>
+                                    <button type="button" class="btn btn-danger roles-delete-button"
+                                        id="{{ $role->id }}">Delete</button>
 
 
                                 </td>
@@ -87,7 +94,7 @@
             </div>
         </div>
 
-            {{-- permission part --}}
+        {{-- permission part --}}
         <div class="permission border border-dark p-5 m-4">
             <h4>Create Permissions</h4>
             <form class="permission-form" action="" method="post" enctype="multipart/form-data">
@@ -108,7 +115,7 @@
                         <tr>
                             <th scope="col">S.N</th>
                             <th scope="col">Roles</th>
-           
+
                             <th scope="col">Action</th>
 
                         </tr>
@@ -119,13 +126,11 @@
                         @endphp
                         @foreach ($permissions as $permission)
                             <tr>
-                                <td>{{$i++}}</td>
+                                <td>{{ $i++ }}</td>
                                 <td>{{ $permission->name }}</td>
                                 <td>
-                                    <a name="edit" class="btn btn-primary update-btn"
-                                        role="button">Edit</a>
-                                    <button type="button" class="btn btn-danger delete-button"
-                                        >Delete</button>
+                                    <a name="edit" class="btn btn-primary update-btn" role="button">Edit</a>
+                                    <button type="button" class="btn btn-danger delete-button">Delete</button>
 
 
                                 </td>
@@ -139,11 +144,13 @@
                 </table>
             </div>
         </div>
+    </div>
 
 
 
 
         <script>
+            $(document).ready(function() {
 
                 $.ajaxSetup({
                     headers: {
@@ -158,28 +165,29 @@
 
                     $.ajax({
                         type: "POST",
-                        url: '{{ route("role.create") }}',
+                        url: '{{ route('role.create') }}',
                         data: formdata,
                         processData: false,
                         contentType: false,
                         success: function(response) {
-                            let i=0;
+                            let i = 1;
                             console.log(response)
-                            let roledata=response.data.map((data)=>{
+                            let roledata = response.data.map((data) => {
                                 return `<tr>
-                                    <td>${i++}</td>
-                                    <td>${data.name}</td>
-                                    <td>${data.permissions.map((permission)=>{
-                                        return `<span>${permission.name},</span>`
-                                    }).join('')}</td>
-                                    <td><a name="edit" class="btn btn-primary update-btn"
-                                        role="button">Edit</a>
-                                    <button type="button" class="btn btn-danger delete-button"
-                                        >Delete</button></td>
-                                    </tr>`
+                                        <td>${i++}</td>
+                                        <td>${data.name}</td>
+                                        <td>${data.permissions.map((permission)=>{
+                                            return `<span>${permission.name},</span>`
+                                        }).join('')}</td>
+                                        <td><a name="edit" class="btn btn-primary update-btn"
+                                            role="button">Edit</a>
+                                        <button type="button" class="btn btn-danger delete-button"
+                                            >Delete</button></td>
+                                        </tr>`
 
                             })
                             $('.role-table-body').html(roledata);
+                            $('input').val('');
                         },
                         error: function(xhr) {
                             console.log(xhr.responseText);
@@ -198,22 +206,22 @@
 
                     $.ajax({
                         type: "POST",
-                        url: '{{ route("permission.create") }}',
+                        url: '{{ route('permission.create') }}',
                         data: formdata,
                         processData: false,
                         contentType: false,
                         success: function(response) {
-                            let j=1;
+                            let j = 1;
                             console.log(response)
-                            let roledata=response.data.map((data)=>{
+                            let roledata = response.data.map((data) => {
                                 return `<tr>
-                                    <td>${j++}</td>
-                                    <td>${data.name}</td>
-                                    <td><a name="edit" class="btn btn-primary update-btn"
-                                        role="button">Edit</a>
-                                    <button type="button" class="btn btn-danger delete-button"
-                                        >Delete</button></td>
-                                    </tr>`
+                                        <td>${j++}</td>
+                                        <td>${data.name}</td>
+                                        <td><a name="edit" class="btn btn-primary update-btn"
+                                            role="button">Edit</a>
+                                        <button type="button" class="btn btn-danger delete-button"
+                                            >Delete</button></td>
+                                        </tr>`
 
                             })
                             $('.permission-table-body').html(roledata);
@@ -225,5 +233,37 @@
                     });
                 });
 
+
+                //deleting the roles
+                $('.role-table-body').on('click', '.roles-delete-button', function() {
+
+                    let roleid = $(this).attr('id');
+                    $.ajax({
+                        type: "DELETE",
+                        url: "{{ route('role.destroy', '') }}/" + roleid,
+                        success: function(response) {
+                            console.log(response)
+                        }
+                    });
+                });
+
+                // function pageRefresh(data){
+                //     let roledata = data.map((data) => {
+                //                 return `<tr>
+        //                         <td>${i++}</td>
+        //                         <td>${data.name}</td>
+        //                         <td>${data.permissions.map((permission)=>{
+        //                             return `<span>${permission.name},</span>`
+        //                         }).join('')}</td>
+        //                         <td><a name="edit" class="btn btn-primary update-btn"
+        //                             role="button">Edit</a>
+        //                         <button type="button" class="btn btn-danger delete-button"
+        //                             >Delete</button></td>
+        //                         </tr>`
+
+                //             })
+                //             $('.role-table-body').html(roledata);
+                // }
+            });
         </script>
     @endsection

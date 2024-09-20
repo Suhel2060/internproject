@@ -38,16 +38,25 @@ Auth::routes();
 // });
 
 Route::prefix('roles')->group(function () {
-    Route::get('/', [RolesController::class, 'index']);
-    Route::post('/create', [RolesController::class, 'create'])->name('role.create')->middleware();
+    Route::get('/', [RolesController::class, 'index'])->name('role.index');
+    Route::post('/create', [RolesController::class, 'create'])->name('role.create');
+    Route::delete('/destroy/{id}', [RolesController::class, 'destroy'])->name('role.destroy');
 });
+
+
 Route::prefix('permission')->group(function () {
     Route::post('/create', [PermissionController::class, 'create'])->name('permission.create');
 });
+
+
 Route::prefix('assignroles')->group(function () {
     Route::post('/user', [SetPermission::class, 'create'])->name('assignrole.create');
     Route::get('/', [SetPermission::class, 'index']);
 });
+
+
+
+
 
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
 Route::prefix('catagory')->group(function (){
