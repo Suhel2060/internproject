@@ -1,8 +1,11 @@
 <?php
 
 use App\Http\Controllers\Api\PostApiController;
+use App\Http\Controllers\TestMiddlewareController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+
+
 
 /*
 |--------------------------------------------------------------------------
@@ -20,6 +23,7 @@ use Illuminate\Support\Facades\Route;
 // });
 
 
+
 Route::post('/signup',[PostApiController::class,'registerUser']);
 Route::post('/login',[PostApiController::class,'loginUser']);
 
@@ -31,3 +35,6 @@ Route::middleware('auth:api')->group(function () {
     Route::post('/createpost',[PostApiController::class,'createPost']);
     Route::delete('/deletepost/{id}',[PostApiController::class,'deletePost']);
 });
+
+
+Route::post('testmiddleware',[TestMiddlewareController::class,'test'])->middleware('custom.middleware');

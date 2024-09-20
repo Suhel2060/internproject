@@ -16,7 +16,10 @@
                                 {{-- <a class="nav-link" href="{{ route('post.create') }}">Create</a> --}}
                             </li>
                             @include('post.modal')
-
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ route('role.index') }}">Roles and Permission</a>
+                                {{-- <a class="nav-link" href="{{ route('post.create') }}">Create</a> --}}
+                            </li>
                         </ul>
                     </div>
                 </nav>
